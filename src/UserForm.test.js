@@ -17,15 +17,19 @@ test("두개의 인풋과 버튼이 잘 표시되는지 확인", () => {
 });
 
 test("유저를 추가할 때 호출이 잘 되는지 확인", async () => {
-  const argList = [];
-  const callback = (...args) => {
-    argList.push(args);
-  };
+  const mock = jest.fn();
 
-  render(<UserForm onUserAdd={callback} />);
+  render(<UserForm onUserAdd={mock} />);
   // 해당 방법이 항상 최선의 방법은 아닐 수 있음을 언제나 기억하기.
   // 두 input을 찾는다.
-  const [nameInput, emailInput] = screen.getAllByRole("textbox");
+
+  const nameInput = screen.getByRole("textbox", {
+    name: /name/i,
+  });
+
+  const emailInput = screen.getByRole("textbox", {
+    name: /email/i,
+  });
 
   // 이름 입력하는 시뮬레이션
   await user.click(nameInput);
@@ -42,6 +46,6 @@ test("유저를 추가할 때 호출이 잘 되는지 확인", async () => {
   user.click(button);
 
   // Assertion to make sure 'onUserAdd' gets called with email/name
-  expect(argList).toHaveLength(1);
-  expect(argList[0][0]).toEqual({ name: "jane", email: "jane@jane.com" });
+  expect(mock).toHaveBeenCalled();
+  expect(mock).toHaveBeenCalledWith({ name: "jane", email: "jane@jane.com" });
 });
