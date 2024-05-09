@@ -49,3 +49,22 @@ test("유저를 추가할 때 호출이 잘 되는지 확인", async () => {
   expect(mock).toHaveBeenCalled();
   expect(mock).toHaveBeenCalledWith({ name: "jane", email: "jane@jane.com" });
 });
+
+test("제출되었을 때 두개의 인풋값을 모두 비운다.", () => {
+  render(<UserForm onUserAdd={() => {}} />);
+
+  const nameInput = screen.getByRole("textbox", { name: /name/i });
+  const emailInput = screen.getByRole("textbox", { name: /email/i });
+  const button = screen.getByRole("button");
+
+  user.click(nameInput);
+  user.keyboard("jane");
+  user.click(emailInput);
+  user.keyboard("jane@jane.com");
+
+  user.click(button);
+
+  // expect: 기대되는 부분, toHaveValue: matchers
+  expect(nameInput).toHaveValue("");
+  expect(emailInput).toHaveValue("");
+});
