@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import user from "@testing-library/user-event";
 import UserForm from "./UserForm";
 
-test("입력창 두개와 버튼이 보인다.", () => {
+test("두개의 인풋과 버튼이 잘 표시되는지 확인", () => {
   // 1. 구성요소 렌더링
   render(<UserForm />);
 
@@ -14,4 +14,34 @@ test("입력창 두개와 버튼이 보인다.", () => {
   //    콜백 (요소 보여주기, 업데이트 다양한 기능 등등)
   expect(inputs).toHaveLength(2);
   expect(button).toBeInTheDocument();
+});
+
+test("유저를 추가할 때 호출이 잘 되는지 확인", async () => {
+  const argList = [];
+  const callback = (...args) => {
+    argList.push(args);
+  };
+
+  render(<UserForm onUserAdd={callback} />);
+  // 해당 방법이 항상 최선의 방법은 아닐 수 있음을 언제나 기억하기.
+  // 두 input을 찾는다.
+  const [nameInput, emailInput] = screen.getAllByRole("textbox");
+
+  // 이름 입력하는 시뮬레이션
+  await user.click(nameInput);
+  await user.keyboard("jane");
+
+  // 이메일 입력하는 시뮬레이션
+  await user.click(emailInput);
+  await user.keyboard("jane@jane.com");
+
+  // 버튼을 찾는다.
+  const button = screen.getByRole("button");
+
+  // 버튼을 누르는 시뮬레이션
+  user.click(button);
+
+  // Assertion to make sure 'onUserAdd' gets called with email/name
+  expect(argList).toHaveLength(1);
+  expect(argList[0][0]).toEqual({ name: "jane", email: "jane@jane.com" });
 });
